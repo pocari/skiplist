@@ -34,9 +34,9 @@ class SkipList
     max_height = 0
     each.with_index.reverse_each.map {|n, i|
       if prev
-        rail = "    " + ('|' * (max_height + 1))
+        rail = "    " + ('| ' * (max_height + 1))
       end
-      station = format("%2s: %s%s", i == 0 ? '@' : n.x, "+" * (n.height + 1), "|" * [0, max_height - n.height].max)
+      station = format("%2s: %s%s", i == 0 ? '@' : n.x, "+ " * (n.height + 1), "| " * [0, max_height - n.height].max)
       prev = n
       max_height = [max_height, n.height].max
       [station, rail]
