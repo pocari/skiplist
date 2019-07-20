@@ -28,6 +28,34 @@ class SkipList
     @stack = Array.new(MAX_HEIGHT)
   end
 
+  def dump
+    # 反対向きからみてそこまでの最大の高さを求めて線路を調整する
+    prev = nil
+    max_height = 0
+    each.with_index.reverse_each.map {|n, i|
+      if prev
+        rail = "    " + ('|' * (max_height + 1))
+      end
+      station = format("%2s: %s%s", i == 0 ? '@' : n.x, "+" * (n.height + 1), "|" * [0, max_height - n.height].max)
+      prev = n
+      max_height = [max_height, n.height].max
+      [station, rail]
+    }.reverse_each do |station, rail|
+      puts station
+      puts rail if rail
+    end
+  end
+
+  def each
+    return to_enum unless block_given?
+
+    u = @sentinel
+    while u
+      yield u
+      u = u.next_nodes[0]
+    end
+  end
+
   def find_pred_node(x)
     u = @sentinel
     r = @height
@@ -54,6 +82,7 @@ class SkipList
     new_node = Node.new(x, pick_height)
     while @height < new_node.height
       @height += 1
+      @sentinel.height = @height
       @stack[@height] = @sentinel
     end
 
@@ -78,6 +107,7 @@ class SkipList
         uuu.next_nodes[r] = uuu.next_nodes[r].next_nodes[r]
         if uuu == sentitnel && !uuu.next_nodes[r]
           @height -= 1
+          @sentinel.height = @height
         end
       end
       r -= 1
@@ -111,9 +141,9 @@ end
 
 sl = SkipList.new
 
-sl.add(1)
-sl.add(3)
-sl.add(5)
-(-1 .. 6).each do |i|
-  puts format("%02d: find: %2s include?: %2s\n", i, sl.find(i), sl.include?(i))
+values = 1.upto(10).to_a.shuffle
+values.each do |v|
+  sl.add(v)
 end
+
+sl.dump
